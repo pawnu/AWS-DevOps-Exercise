@@ -1,1 +1,2 @@
 new file
+This file has been modified on Ubuntu VM
