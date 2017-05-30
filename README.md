@@ -1,1 +1,1 @@
-task 7 of devops exercise book
+Exercises given by QAC for DevOps course.
