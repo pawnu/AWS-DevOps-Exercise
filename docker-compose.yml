@@ -1,0 +1,20 @@
+version : '2'
+
+services:
+  db:
+    image: mysql:8.0
+    ports:
+       - "3333:3333"
+    volumes:
+       - /home/ubuntu/mysqldir:/var/www/html
+    environment:
+       MYSQL_ROOT_PASSWORD: passwerd
+  php:
+    image: php:7.0-apache
+    links:
+      - db:db
+    ports:
+      - "80:80"
+    volumes:
+      - /home/ubuntu/mysqldir:/var/www/html
+    
