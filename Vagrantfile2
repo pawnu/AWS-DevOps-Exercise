@@ -1,0 +1,38 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure(2) do |config|
+  config.vm.define "ubuntu" do |ubuntu|
+	  ubuntu.vm.hostname="Pawan.qac.local"
+	  ubuntu.vm.box = "chad-thompson-VAGRANTSLASH-ubuntu-trusty64-gui"
+	  ubuntu.vm.network:public_network, ip:"192.168.1.17"
+	  ubuntu.vm.synced_folder "shared", "/tmp/shared"
+
+	  ubuntu.vm.provider "virtualbox" do |vb|
+	     # Display the VirtualBox GUI when booting the machine
+	     vb.gui = true
+	     vb.name = "Ubuntu Machine"
+	     vb.cpus =2 
+	     vb.memory = "4096"
+  	  end
+  end
+  config.vm.define "centos" do |centos|
+	  centos.vm.hostname="Pawan1.qac.local"
+	  centos.vm.box = "centos-VAGRANTSLASH-7"
+	  centos.vm.network:public_network
+	  centos.vm.synced_folder "shared", "/tmp/shared"
+
+	  centos.vm.provider "virtualbox" do |vb|
+	     # Display the VirtualBox GUI when booting the machine
+	     vb.gui = true
+	     vb.name = "CentOS"
+	     vb.cpus =2 
+	     vb.memory = "4096"
+  	  end
+  end
+  config.vm.provision :shell, path: "bootstrap.sh"
+end
