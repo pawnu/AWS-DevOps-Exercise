@@ -84,4 +84,3 @@ mvn -v
 git --version
 sudo service jenkins status
 ps -ef | grep JIRA
-./bin/nexus status
