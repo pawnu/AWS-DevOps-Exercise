@@ -1,0 +1,123 @@
+#filename javamavengit.yml
+---
+- name: install java, maven and git
+  hosts: all
+  remote_user: vagrant
+  become: yes
+ 
+  tasks:
+#   - name: copy Java
+#     copy: 
+#       src: /tmp/shared/java.tar.gz 
+#       dest: /opt/java.tar.gz
+
+#   - name: Copy Maven
+#     copy: 
+#       src: /tmp/shared/maven.tar.gz 
+#       dest: /opt/maven.tar.gz
+
+#   - name: Copy Jenkins
+#     copy:
+#       src: /tmp/shared/jenkins_2.1_all.deb
+#       dest: /home/vagrant/Desktop/jenkins_2.1_all.deb
+
+#   - name: Copy Jira
+#     copy:
+#       src: /tmp/shared/jira.bin
+#       dest: /opt/jira.bin
+#       mode: 755
+
+#   - name: Copy responsefile
+#     copy:
+#       src: /tmp/shared/response.varfile
+#       dest: /opt/response.varfile
+#
+#   - name: Copy Nexus
+#     copy:
+#       src: /tmp/shared/nexus-2.14.4-03-bundle.tar.gz
+#       dest: /usr/local/nexus-2.14.4-03-bundle.tar.gz
+
+#   - name: Install java
+#     unarchive: 
+#       src: /opt/java.tar.gz
+#       dest: /opt/
+#       copy: no
+
+#   - name: Install maven
+#     unarchive:
+#       src: /opt/maven.tar.gz
+#       dest: /opt/
+#       copy: no
+
+#   - name: create symlinks
+#     shell: "{{ item }}"
+#     with_items:
+#      - "update-alternatives --install /usr/bin/java java /opt/jdk1.8.0_45/bin/java 100"
+#      - "update-alternatives --install /usr/bin/javac javac /opt/jdk1.8.0_45/bin/javac 100"
+#      - "update-alternatives --install /usr/bin/mvn mvn /opt/apache-maven-3.3.9/bin/mvn 100"
+
+#   - name: update package manager  
+#     apt: update_cache=yes
+
+#   - name: install git
+#     apt: name=git state=present
+
+#   - name: Install Jenkins
+#     apt: deb="/home/vagrant/Desktop/jenkins_2.1_all.deb"
+
+#   - name: Run Jenkins
+#     service: name=jenkins state=started enabled=yes
+
+#   - name: Install Jira
+#     shell: "./jira.bin -q -varfile response.varfile"
+#     args:
+#       chdir: /opt/
+   
+#   - name: Unpack nexus
+#     unarchive:
+#       src: /usr/local/nexus-2.14.4-03-bundle.tar.gz
+#       dest: /usr/local/
+#       copy: no
+
+#   - name: Create nexus symlink folder
+#     file: 
+#      path: usr/local/nexus
+#      state: directory
+#      mode: 0755
+
+#   - name: Delete nexus dir
+#     file: path=/usr/local/nexus state=absent
+
+#   - name: Make nexus smylink
+#     file:
+#       src: /usr/local/nexus-2.14.4-03 
+#       dest: /usr/local/nexus
+#       state: link
+#       owner: vagrant
+#       mode: 0755
+#       force: yes
+#   - name: Change nexus permission
+#     file:
+#       path: /usr/local/nexus
+#       owner: vagrant
+#       mode: 0755
+
+#   - name: Change sonatype permission
+#     file:
+#       path: /usr/local/sonatype-work
+#       owner: vagrant
+#       mode: 0755
+
+#   - name: Change java version to run nexus
+#     shell: "echo '1' | sudo update-alternatives --config java"
+
+   - name: Run nexus
+     shell: "{{ item }}"
+     become: true
+     become_user: root
+     args:
+       chdir: /usr/local/nexus/
+     with_items:
+      - "./bin/nexus console"
+      - "./bin/nexus start"
+
