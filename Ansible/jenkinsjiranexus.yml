@@ -1,0 +1,88 @@
+#filename jenkinsjiranexus.yml
+---
+- name: install jenkins, jira and nexus
+  hosts: all
+  remote_user: vagrant
+  become: yes
+
+  tasks:
+
+   - name: Copy Jenkins
+     copy:
+       src: /tmp/shared/jenkins_2.1_all.deb
+       dest: /home/vagrant/Desktop/jenkins_2.1_all.deb
+
+   - name: Copy Jira
+     copy:
+       src: /tmp/shared/jira.bin
+       dest: /opt/jira.bin
+       mode: 755
+
+   - name: Copy responsefile
+     copy:
+       src: /tmp/shared/response.varfile
+       dest: /opt/response.varfile
+
+   - name: Copy Nexus
+     copy:
+       src: /tmp/shared/nexus-2.14.4-03-bundle.tar.gz
+       dest: /usr/local/nexus-2.14.4-03-bundle.tar.gz
+
+   - name: update package manager
+     apt: update_cache=yes
+
+   - name: Install Jenkins
+     apt: deb="/home/vagrant/Desktop/jenkins_2.1_all.deb"
+
+   - name: Run Jenkins
+     service: name=jenkins state=started enabled=yes
+
+   - name: Install Jira
+     shell: "./jira.bin -q -varfile response.varfile"
+     args:
+       chdir: /opt/
+       creates: /opt/atlassian/jira/atlassian-jira/WEB-INF
+
+   - name: Unpack nexus
+     unarchive:
+       src: /usr/local/nexus-2.14.4-03-bundle.tar.gz
+       dest: /usr/local/
+       copy: no
+
+   - stat:
+       path: /usr/local/nexus
+     register: nexusdir
+
+   - name: Create nexus symlink folder
+     file:
+      path: usr/local/nexus
+      state: directory
+      mode: 0755
+     when: not nexusdir.stat.exists
+
+   - name: Make nexus smylink
+     file:
+       src: /usr/local/nexus-2.14.4-03
+       dest: /usr/local/nexus
+       state: link
+       owner: vagrant
+       mode: 0755
+       force: yes
+
+   - name: Change sonatype permission
+     file:
+       path: /usr/local/sonatype-work
+       owner: vagrant
+       mode: 0755
+
+   - name: Change java version to run nexus
+     shell: "echo '1' | sudo update-alternatives --config java"
+
+   - name: Run nexus
+     shell: "{{ item }}"
+     become_user: vagrant
+     args:
+       chdir: /usr/local/nexus/
+     with_items:
+      - "./bin/nexus console"
+      - "./bin/nexus start"
