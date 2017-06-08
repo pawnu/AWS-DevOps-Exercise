@@ -1,0 +1,52 @@
+#filename zabbix.yml
+---
+- name: install zabbix
+  hosts: all
+  remote_user: vagrant
+  become: yes
+
+  tasks:
+   - name: Download zabbix
+     get_url:
+       url: http://repo.zabbix.com/zabbix/2.4/debian/pool/main/z/zabbix-release/zabbix-release_2.4-1+wheezy_all.deb
+       dest: /opt/zabbix-release_2.4-1+trusty_all.deb
+       mode: 0755
+   - name: Depackage zabbix
+     apt: deb="/opt/zabbix-release_2.4-1+trusty_all.deb"
+
+   - name: Install php5 mysql
+     apt: name=php5-mysql state=present
+
+   - name: Install zabbix
+     apt: name=zabbix-server-mysql state=present
+
+   - name: Install zabbix frontend php
+     apt: name=zabbix-frontend-php state=present
+
+   - name: Edit apache config
+     shell: "{{ item }}"
+     with_items:
+      - "vi -c "%s/post_max_size = 8M/post_max_size = 16M/g|wq" /etc/php5/apache2/php.ini"
+      - "vi -c "%s/max_execution_time = 30/max_execution_time = 300/g|wq" /etc/php5/apache2/php.ini"
+      - "vi -c "%s/post_input_time = 60/max_input_time = 300/g|wq" /etc/php5/apache2/php.ini"
+      - "vi -c "%s/;date.timezone =/date.timezone = Europe\/London/g|wq" /etc/php5/apache2/php.ini"
+   - name: restart apache2
+     service: name=apache2 state=restarted
+   - name: copy apache config file to zabbix
+     copy:
+       src: /tmp/shared/apache.conf
+       dest: /etc/zabbix/apache.conf
+   - name: copy apache config file to apache2
+     copy:
+       src: /tmp/shared/apache.conf
+       dest: /etc/apache2/conf-available/zabbix.conf
+   - name: Use a2enconf on config file
+     shell: a2enconf zabbix.conf
+     args:
+       chdir: /etc/apache2/conf-available/
+   - name: restart apache2
+     service: name=apache2 state=restarted
+   - name: Run zabbix server
+     service: name=zabbix state=started enabled=yes
+
+

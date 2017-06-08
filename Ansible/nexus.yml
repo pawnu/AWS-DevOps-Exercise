@@ -1,0 +1,33 @@
+---
+- name: install jenkins, jira and nexus
+  hosts: all
+  remote_user: vagrant
+  become: yes
+
+  tasks:
+
+   - name: Copy Nexus
+     copy:
+       src: /tmp/shared/nexus-3.0.2-02-unix.tar.gz
+       dest: /opt/
+
+   - name: Install nexus
+     unarchive:
+       src: /opt/nexus-3.0.2-02-unix.tar.gz
+       dest: /opt/
+       copy: no
+
+   - name: Set permissions
+     file:
+      dest: /opt/nexus-3.0.2-02
+      state: directory
+      owner: vagrant
+      mode: 0755
+      recurse: yes
+
+   - name: Run nexus
+     shell: ./bin/nexus run
+     async: 10
+     become_user: vagrant
+     args:
+       chdir: /opt/nexus-3.0.2-02

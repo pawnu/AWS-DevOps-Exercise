@@ -48,7 +48,12 @@
        src: /usr/local/nexus-2.14.4-03-bundle.tar.gz
        dest: /usr/local/
        copy: no
-
+   - name: Change nexus inner file permission
+     file:
+       dest: /usr/local/nexus-2.14.4-03
+       owner: vagrant
+       mode: 0775
+       recurse: yes
    - stat:
        path: /usr/local/nexus
      register: nexusdir
@@ -58,6 +63,7 @@
       path: usr/local/nexus
       state: directory
       mode: 0755
+      recurse: yes
      when: not nexusdir.stat.exists
 
    - name: Make nexus smylink
