@@ -26,12 +26,14 @@
    - name: Edit apache config
      shell: "{{ item }}"
      with_items:
-      - "vi -c "%s/post_max_size = 8M/post_max_size = 16M/g|wq" /etc/php5/apache2/php.ini"
-      - "vi -c "%s/max_execution_time = 30/max_execution_time = 300/g|wq" /etc/php5/apache2/php.ini"
-      - "vi -c "%s/post_input_time = 60/max_input_time = 300/g|wq" /etc/php5/apache2/php.ini"
-      - "vi -c "%s/;date.timezone =/date.timezone = Europe\/London/g|wq" /etc/php5/apache2/php.ini"
+      - "vi -c '%s/post_max_size = 8M/post_max_size = 16M/ge|wq!' /etc/php5/apache2/php.ini"
+      - "vi -c '%s/max_execution_time = 30/max_execution_time = 300/ge|wq!' /etc/php5/apache2/php.ini"
+      - "vi -c '%s/post_input_time = 60/max_input_time = 300/ge|wq!' /etc/php5/apache2/php.ini"
+      - "vi -c '%s/;date.timezone =/date.timezone = Europe\\/London/ge|wq!' /etc/php5/apache2/php.ini"
+
    - name: restart apache2
      service: name=apache2 state=restarted
+
    - name: copy apache config file to zabbix
      copy:
        src: /tmp/shared/apache.conf
@@ -47,6 +49,6 @@
    - name: restart apache2
      service: name=apache2 state=restarted
    - name: Run zabbix server
-     service: name=zabbix state=started enabled=yes
+     service: name=zabbix-server state=started enabled=yes
 
 
