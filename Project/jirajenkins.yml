@@ -1,0 +1,40 @@
+#filename jirajenkins.yml
+---
+- name: install java, maven and git, jenkins, jira
+  hosts: all
+  remote_user: ubuntu
+  become: yes
+  tasks:
+   - name: update package manager
+     apt: update_cache=yes
+   - name: Install pip
+     apt: name=python-pip state=present
+   - name: Install docker
+     shell: "pip install docker-py"       
+   - name: Install Java
+     docker:
+       name: Java
+       image: openjdk
+       state: present
+   - name: Install maven
+     docker:
+       name: maven
+       image: maven
+       state: present
+   - name: Run JIRA
+     docker_container:
+       name: jira
+       image: cptactionhank/atlassian-jira
+       state: started
+       restart: yes
+       ports:
+        - "8080:8080"
+
+   - name: Run jenkins
+     docker_container:
+       name: jenkins
+       image: jenkins
+       state: started
+       ports:
+        - "8081:8080"
+        - "50000:50000"
