@@ -1,6 +1,6 @@
-#filename jirajenkins.yml
+#filename jirajenkinsnexus.yml
 ---
-- name: install jenkins, jira
+- name: nexus
   hosts: all
   remote_user: ubuntu
   become: yes
@@ -11,19 +11,19 @@
      apt: name=python-pip state=present
    - name: Install docker
      shell: "wget -qO- https://get.docker.com/ | sh"       
-   - name: Run JIRA
+   - name: Create nexus data container
      docker_container:
-       name: jira
-       image: cptactionhank/atlassian-jira
-       state: started
-       restart: yes
-       ports:
-        - "8080:8080"
-   - name: Run jenkins
+       name: nexus-data
+       image: busybox
+       volumes:
+        - /data
+   - name: Run Nexus
      docker_container:
-       name: jenkins
-       image: jenkins
+       name: nexus
+       image: sonatype/nexus
+       pull: yes
        state: started
        ports:
-        - "8081:8080"
-        - "50000:50000"
+        - "8082:8081"
+       volumes_from:
+        - nexus-data
