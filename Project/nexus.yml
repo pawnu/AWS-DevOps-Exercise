@@ -11,6 +11,8 @@
      apt: name=python-pip state=present
    - name: Install docker
      shell: "wget -qO- https://get.docker.com/ | sh"       
+   - name: Install docker py
+     pip: name=docker-py state=present
    - name: Create nexus data container
      docker_container:
        name: nexus-data
