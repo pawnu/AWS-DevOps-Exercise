@@ -1,0 +1,16 @@
+#filename javamagengit.yml
+---
+- name: install java, maven and git
+  hosts: all
+  remote_user: ubuntu
+  become: yes
+  tasks:
+   - name: update package manager
+     apt: update_cache=yes
+   - name: Install Java
+     apt: name=openjdk-8-jdk state=present
+   - name: Install git    
+     apt: name=git state=present
+   - name: Install Maven
+     apt: name=maven state=present
+

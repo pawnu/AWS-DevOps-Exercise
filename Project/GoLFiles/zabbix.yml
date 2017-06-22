@@ -1,0 +1,54 @@
+#filename zabbix.yml
+---
+- name: install zabbix
+  hosts: all
+  remote_user: ubuntu
+  become: yes
+  tasks:
+   - name: update package manager
+     apt: update_cache=yes
+   - name: Install pip
+     apt: name=python3-pip state=present
+   - name: Install docker
+     shell: "wget -qO- https://get.docker.com/ | sh"
+   - name: Install apache2
+     apt: name=apache2 state=present
+   - name: Install docker py
+     pip: name=docker-py state=present
+   - name: Install mysql
+     docker_container:
+       name: mysqlzab
+       image: mysql
+       state: started
+       env:
+         MYSQL_ROOT_PASSWORD: zabb
+         MYSQL_USER: zabbix
+         MYSQL_PASSWORD: zabbix
+   - name: Install zabbix server
+     docker_container:
+       name: zabbixserver
+       image: zabbix/zabbix-server-mysql
+       state: started
+       links:
+        - "mysqlzab:mzab"
+       env:
+        DB_SERVER_HOST: mysqlzab
+        MYSQL_USER: zabbix
+        MYSQL_PASSWORD: zabbix
+
+   - name: Install zabbix frontend on Ubuntu
+     docker_container:
+       name: zabbixapache
+       image: zabbix/zabbix-web-apache-mysql:ubuntu-3.0-latest
+       state: started
+       restart: yes
+       links:
+        - "mysqlzab:mzab"
+        - "zabbixserver:zserver"
+       env:
+        DB_SERVER_HOST: mysqlzab
+        MYSQL_USER: zabbix
+        MYSQL_PASSWORD: zabbix
+        PHP_TZ: Europe/London
+        ZBX_SERVER_HOST: zabbixserver
+

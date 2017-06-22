@@ -1,0 +1,16 @@
+#Tomcat.yml
+---
+- name: install tomcat
+  hosts: all
+  remote_user: ubuntu
+  become: yes
+  tasks:
+   - name: Run tomcat
+     docker_container:
+       name: tomcat
+       image: cloudesire/tomcat:7-jre8
+       state: started
+       ports:
+        - "8888:8080"
+       env:
+           TOMCAT_PASS="mypass"

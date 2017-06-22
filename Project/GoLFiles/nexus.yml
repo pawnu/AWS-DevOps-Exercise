@@ -1,0 +1,31 @@
+#filename jirajenkinsnexus.yml
+---
+- name: nexus
+  hosts: all
+  remote_user: ubuntu
+  become: yes
+  tasks:
+   - name: update package manager
+     apt: update_cache=yes
+   - name: Install pip
+     apt: name=python3-pip state=present
+   - name: Install docker
+     shell: "wget -qO- https://get.docker.com/ | sh"       
+   - name: Install docker py
+     pip: name=docker-py state=present
+   - name: Create nexus data container
+     docker_container:
+       name: nexus-data
+       image: busybox
+       volumes:
+        - /data
+   - name: Run Nexus
+     docker_container:
+       name: nexus
+       image: sonatype/nexus
+       pull: yes
+       state: started
+       ports:
+        - "8082:8081"
+       volumes_from:
+        - nexus-data

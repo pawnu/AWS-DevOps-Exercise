@@ -1,0 +1,27 @@
+#filename zabbix.yml
+---
+- name: install zabbix
+  hosts: all
+  remote_user: ubuntu
+  become: yes
+  tasks:
+   - name: update package manager
+     apt: update_cache=yes
+   - name: Install pip
+     apt: name=python3-pip state=present
+   - name: Install docker
+     shell: "wget -qO- https://get.docker.com/ | sh"
+   - name: Install docker py
+     pip: name=docker-py state=present
+   - name: Install apache2
+     apt: name=apache2 state=present
+   - name: Install zabbix from berngp
+     docker_container:
+       name: zabbix
+       image: berngp/docker-zabbix
+       state: started
+       ports:
+        - "10051:10051"
+        - "10052:10052"
+        - "8082:80"
+        - "2812:2812"

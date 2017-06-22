@@ -1,0 +1,23 @@
+#filename jirajenkins.yml
+---
+- name: install jenkins, jira
+  hosts: all
+  remote_user: ubuntu
+  become: yes
+  tasks:
+   - name: update package manager
+     apt: update_cache=yes
+   - name: Install pip
+     apt: name=python3-pip state=present
+   - name: Install docker
+     shell: "wget -qO- https://get.docker.com/ | sh"       
+   - name: Install docker py
+     pip: name=docker-py state=present
+   - name: Run jenkins
+     docker_container:
+       name: jenkins
+       image: jenkins
+       state: started
+       ports:
+        - "8081:8080"
+        - "50000:50000"

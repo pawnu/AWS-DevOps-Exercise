@@ -1,0 +1,23 @@
+#filename jirajenkins.yml
+---
+- name: install jenkins, jira
+  hosts: all
+  remote_user: ubuntu
+  become: yes
+  tasks:
+   - name: update package manager
+     apt: update_cache=yes
+   - name: Install pip
+     apt: name=python3-pip state=present
+   - name: Install docker
+     shell: "wget -qO- https://get.docker.com/ | sh"       
+   - name: Install docker py
+     pip: name=docker-py state=present
+   - name: Run JIRA
+     docker_container:
+       name: jira
+       image: cptactionhank/atlassian-jira
+       state: started
+       restart: yes
+       ports:
+        - "8080:8080"
